@@ -5,7 +5,7 @@ const handler: APIGatewayProxyHandler = async (event, _context) => {
     statusCode: 200,
     body: JSON.stringify({
       message: 'UPDATE',
-      input: event,
+      qsp: event.queryStringParameters,
     }),
   };
 }

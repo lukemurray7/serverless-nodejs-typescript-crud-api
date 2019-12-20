@@ -1,21 +1,50 @@
 service:
-  name: aws-nodejs-typescript
+  name: mysense-tech-test
 
 # Add the serverless-webpack plugin
 plugins:
   - serverless-webpack
+  - serverless-iam-roles-per-function
 
 provider:
+  region: eu-west-1
   name: aws
-  runtime: nodejs10
+  runtime: nodejs10.x
+  environment:
+    SECRET_NAME: ${env:SECRET_NAME, file(env.yml):SECRET_NAME}
 
 functions:
+  auth:
+    handler: handlers/auth.handler
+    iamRoleStatementsName: ${self:service}-auth
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - 'ssm:GetParameter'
+        Resource:
+          Fn::Join:
+            - ''
+            - - 'arn:aws:ssm:eu-west-1:'
+              - Ref: AWS::AccountId
+              - ':parameter/${env:SECRET_NAME, file(env.yml):SECRET_NAME}'
+
   create:
     handler: handlers/create.handler
     events:
       - http:
           method: post
           path: create
+    iamRoleStatementsName: ${self:service}-create
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:CreateItem
+        Resource:
+          Fn::Join:
+            - ':'
+            - - 'arn:aws:dynamodb:eu-west-1'
+              - Ref: AWS::AccountId
+              - 'table/sensor-data-table'
     
   
   read:
@@ -24,6 +53,18 @@ functions:
       - http:
           method: get
           path: read
+          authorizer: auth
+    iamRoleStatementsName: ${self:service}-read
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:GetItem 
+        Resource:
+          Fn::Join:
+            - ':'
+            - - 'arn:aws:dynamodb:eu-west-1'
+              - Ref: AWS::AccountId
+              - 'table/sensor-data-table'
 
   
   update:
@@ -32,6 +73,17 @@ functions:
       - http:
           method: post
           path: update
+    iamRoleStatementsName: ${self:service}-update
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:PutItem
+        Resource:
+          Fn::Join:
+            - ':'
+            - - 'arn:aws:dynamodb:eu-west-1'
+              - Ref: AWS::AccountId
+              - 'table/sensor-data-table'
   
   delete:
     handler: handlers/delete.handler
@@ -39,6 +91,17 @@ functions:
       - http:
           method: post
           path: delete
+    iamRoleStatementsName: ${self:service}-delete
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:DeleteItem
+        Resource:
+          Fn::Join:
+            - ':'
+            - - 'arn:aws:dynamodb:eu-west-1'
+              - Ref: AWS::AccountId
+              - 'table/sensor-data-table'
 
   
 
