@@ -34,6 +34,11 @@ functions:
       - http:
           method: post
           path: create
+          authorizer:
+            name: auth
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: token
     iamRoleStatementsName: ${self:service}-create
     iamRoleStatements:
       - Effect: "Allow"
@@ -53,7 +58,11 @@ functions:
       - http:
           method: get
           path: read
-          authorizer: auth
+          authorizer:
+            name: auth
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: token
     iamRoleStatementsName: ${self:service}-read
     iamRoleStatements:
       - Effect: "Allow"
@@ -73,6 +82,11 @@ functions:
       - http:
           method: post
           path: update
+          authorizer:
+            name: auth
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: token
     iamRoleStatementsName: ${self:service}-update
     iamRoleStatements:
       - Effect: "Allow"
@@ -91,6 +105,11 @@ functions:
       - http:
           method: post
           path: delete
+          authorizer:
+            name: auth
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: token
     iamRoleStatementsName: ${self:service}-delete
     iamRoleStatements:
       - Effect: "Allow"
@@ -103,10 +122,7 @@ functions:
               - Ref: AWS::AccountId
               - 'table/sensor-data-table'
 
-  
 
-
-# you can add CloudFormation resource templates here
 resources:
  Resources:
   SensorDataTable:
