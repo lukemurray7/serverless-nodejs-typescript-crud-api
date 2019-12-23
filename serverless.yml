@@ -13,6 +13,7 @@ provider:
   environment:
     SECRET_NAME: ${env:SECRET_NAME, file(env.yml):SECRET_NAME}
     TABLE_NAME: ${env:TABLE_NAME, file(env.yml):TABLE_NAME}
+    EMAIL_SUBSCRIBER_ADDRESS: ${env:EMAIL_SUBSCRIBER_ADDRESS, file(env.yml):EMAIL_SUBSCRIBER_ADDRESS}
 
 functions:
   auth:
@@ -158,9 +159,28 @@ functions:
               - Ref: AWS::AccountId
               - 'table/sensor-data-table'
 
+  notify-slack:
+    handler: dist/handlers/notify-slack.handler
+    events:
+      - sns:
+          arn: !Ref DeletedTopic
+          topicName: ${self:service}-deleted-topic
 
 resources:
  Resources:
+  
+  DeletedTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:service}-deleted-topic
+
+  SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+          Endpoint: ${self:provider.environment.EMAIL_SUBSCRIBER_ADDRESS}
+          Protocol: email
+          TopicArn: !Ref DeletedTopic
+
   SensorDataTable:
       Type: AWS::DynamoDB::Table
       Properties:
