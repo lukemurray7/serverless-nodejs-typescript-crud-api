@@ -11,8 +11,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 
   try {
-    await db.delete(id);
-    return lambdaResponse(null, JSON.stringify({ id }));
+    const item = await db.fetch(id);
+    return lambdaResponse(null, JSON.stringify({ item }));
   } catch (error) {
     return lambdaResponse({
       statusCode: error.statusCode || 500,

@@ -53,34 +53,53 @@ functions:
               - 'table/sensor-data-table'
     
   
-  read:
-    handler: dist/handlers/read.handler
+  fetch:
+    handler: dist/handlers/fetch.handler
     events:
-      - http:
-          method: get
-          path: read
-          authorizer:
-            name: auth
-            resultTtlInSeconds: 0
-            identitySource: method.request.header.Authorization
-            type: token
       - http:
           method: get
           path: read/{id}
           request:
             parameters:
               paths:
-                id: false
+                id: true
           authorizer:
             name: auth
             resultTtlInSeconds: 0
             identitySource: method.request.header.Authorization
             type: token
-    iamRoleStatementsName: ${self:service}-read
+    iamRoleStatementsName: ${self:service}-fetch
     iamRoleStatements:
       - Effect: "Allow"
         Action:
-          - dynamodb:GetItem 
+          - dynamodb:GetItem
+        Resource:
+          Fn::Join:
+            - ':'
+            - - 'arn:aws:dynamodb:eu-west-1'
+              - Ref: AWS::AccountId
+              - 'table/sensor-data-table'
+  
+  list:
+    handler: dist/handlers/list.handler
+    events:
+      - http:
+          method: get
+          path: read
+          request:
+            parameters:
+              paths:
+                id: true
+          authorizer:
+            name: auth
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: token
+    iamRoleStatementsName: ${self:service}-list
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Scan
         Resource:
           Fn::Join:
             - ':'
@@ -93,7 +112,7 @@ functions:
     handler: dist/handlers/update.handler
     events:
       - http:
-          method: post
+          method: put
           path: update
           authorizer:
             name: auth
@@ -116,8 +135,12 @@ functions:
     handler: dist/handlers/delete.handler
     events:
       - http:
-          method: post
-          path: delete
+          method: delete
+          path: delete/{id}
+          request:
+            parameters:
+              paths:
+                id: true
           authorizer:
             name: auth
             resultTtlInSeconds: 0

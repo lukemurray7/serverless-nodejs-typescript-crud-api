@@ -12,7 +12,6 @@
       "node",
       "jest"
     ],
-    "esModuleInterop": true,
     "inlineSourceMap": true
   }
 }

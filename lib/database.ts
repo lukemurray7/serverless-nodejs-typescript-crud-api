@@ -37,17 +37,11 @@ const update = async (item: DynamoDB.DocumentClient.PutItemInputAttributeMap) =>
   const dynamodb = new DynamoDB.DocumentClient();
   const params = {
     TableName,
-    KeyConditionExpression: 'attribute_exists(id)',
-    ExpressionAttributeNames: {
-      '#id': 'id',
-    },
-    ExpressionAttributeValues: {
-      ':id': item.id,
-    },
+    ConditionExpression: 'attribute_exists(id)',
     Item: item,
   }
   const created = await dynamodb.put(params).promise();
-  return created.$response;
+  return item;
 };
 
 const deleteItem = async (id: string) => {
@@ -59,7 +53,7 @@ const deleteItem = async (id: string) => {
     },
   }
   const deleted = await dynamodb.delete(params).promise();
-  return deleted.$response;
+  return id;
 };
 
 export default {
