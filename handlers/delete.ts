@@ -1,7 +1,15 @@
 import { APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda';
 
-import { lambdaResponse } from '../helpers';
+import { lambdaResponse } from '../helpers/lambda-response';
+import { PutItemOutput } from 'aws-sdk/clients/dynamodb';
+import { publish } from '../lib/notification';
 import db from '../lib/database';
+
+/**
+ * Delete a sensor data item from the database. Returns the id
+ *
+ * @param event Api gateway event object
+ */
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const id: string = event.pathParameters ? event.pathParameters.id : '';
@@ -11,8 +19,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 
   try {
-    await db.delete(id);
-    return lambdaResponse(null, JSON.stringify({ id }));
+    const deleted: PutItemOutput = await db.delete(id);
+    await publish(deleted.Attributes || { id });
+    return lambdaResponse(null, JSON.stringify(deleted.Attributes || { id }));
   } catch (error) {
     return lambdaResponse({
       statusCode: error.statusCode || 500,

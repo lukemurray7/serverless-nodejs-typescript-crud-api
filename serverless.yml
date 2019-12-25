@@ -11,13 +11,13 @@ provider:
   name: aws
   runtime: nodejs10.x
   environment:
-    SECRET_NAME: ${env:SECRET_NAME, file(env.yml):SECRET_NAME}
-    TABLE_NAME: ${env:TABLE_NAME, file(env.yml):TABLE_NAME}
-    EMAIL_SUBSCRIBER_ADDRESS: ${env:EMAIL_SUBSCRIBER_ADDRESS, file(env.yml):EMAIL_SUBSCRIBER_ADDRESS}
+    TABLE_NAME: ${file(env.yml):TABLE_NAME}
 
 functions:
   auth:
     handler: dist/handlers/auth.handler
+    environment:
+      SECRET_NAME: ${file(env.yml):SECRET_NAME}
     iamRoleStatementsName: ${self:service}-auth
     iamRoleStatements:
       - Effect: 'Allow'
@@ -28,7 +28,7 @@ functions:
             - ''
             - - 'arn:aws:ssm:eu-west-1:'
               - Ref: AWS::AccountId
-              - ':parameter/${env:SECRET_NAME, file(env.yml):SECRET_NAME}'
+              - ':parameter/${file(env.yml):SECRET_NAME}'
 
   create:
     handler: dist/handlers/create.handler
@@ -47,11 +47,7 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource:
-          Fn::Join:
-            - ':'
-            - - 'arn:aws:dynamodb:eu-west-1'
-              - Ref: AWS::AccountId
-              - 'table/sensor-data-table'
+          - "Fn::GetAtt": [ SensorDataTable, Arn ]
     
   
   fetch:
@@ -75,11 +71,7 @@ functions:
         Action:
           - dynamodb:GetItem
         Resource:
-          Fn::Join:
-            - ':'
-            - - 'arn:aws:dynamodb:eu-west-1'
-              - Ref: AWS::AccountId
-              - 'table/sensor-data-table'
+          - "Fn::GetAtt": [ SensorDataTable, Arn ]
   
   list:
     handler: dist/handlers/list.handler
@@ -102,11 +94,7 @@ functions:
         Action:
           - dynamodb:Scan
         Resource:
-          Fn::Join:
-            - ':'
-            - - 'arn:aws:dynamodb:eu-west-1'
-              - Ref: AWS::AccountId
-              - 'table/sensor-data-table'
+          - "Fn::GetAtt": [ SensorDataTable, Arn ]
 
   
   update:
@@ -126,14 +114,17 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource:
-          Fn::Join:
-            - ':'
-            - - 'arn:aws:dynamodb:eu-west-1'
-              - Ref: AWS::AccountId
-              - 'table/sensor-data-table'
+          - "Fn::GetAtt": [ SensorDataTable, Arn ]
   
   delete:
     handler: dist/handlers/delete.handler
+    environment:
+      DELETE_SNS_ARN:
+        Fn::Join:
+            - ':'
+            - - 'arn:aws:sns:eu-west-1'
+              - Ref: AWS::AccountId
+              - '${self:service}-deleted-topic'
     events:
       - http:
           method: delete
@@ -153,18 +144,22 @@ functions:
         Action:
           - dynamodb:DeleteItem
         Resource:
-          Fn::Join:
-            - ':'
-            - - 'arn:aws:dynamodb:eu-west-1'
-              - Ref: AWS::AccountId
-              - 'table/sensor-data-table'
+          - "Fn::GetAtt": [ SensorDataTable, Arn ]
+
+      - Effect: "Allow"
+        Action:
+          - sns:Publish
+        Resource: !Ref DeletedTopic
 
   notify-slack:
     handler: dist/handlers/notify-slack.handler
+    environment:
+      SLACK_ENDPOINT: ${file(env.yml):SLACK_ENDPOINT}
     events:
       - sns:
           arn: !Ref DeletedTopic
           topicName: ${self:service}-deleted-topic
+    
 
 resources:
  Resources:
@@ -177,7 +172,7 @@ resources:
   SNSSubscription:
       Type: AWS::SNS::Subscription
       Properties:
-          Endpoint: ${self:provider.environment.EMAIL_SUBSCRIBER_ADDRESS}
+          Endpoint: ${file(env.yml):EMAIL_SUBSCRIBER_ADDRESS}
           Protocol: email
           TopicArn: !Ref DeletedTopic
 

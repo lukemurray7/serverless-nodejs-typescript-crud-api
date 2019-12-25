@@ -1,59 +1,65 @@
 import { DynamoDB } from 'aws-sdk';
+import {
+  AttributeMap,
+  ScanInput,
+  ScanOutput,
+  GetItemInput,
+  DocumentClient,
+  PutItemOutput,
+  GetItemOutput,
+  DeleteItemOutput
+} from 'aws-sdk/clients/dynamodb';
 
 const TableName = process.env.TABLE_NAME || '';
 
-const fetch = async (id: string) => {
-  const dynamodb = new DynamoDB.DocumentClient();
-  const params = {
+const fetch = async (id: string): Promise<GetItemOutput> => {
+  const dynamodb = new DocumentClient();
+  const params: DocumentClient.GetItemInput = {
     TableName,
     Key: { id },
   }
-  const data = await dynamodb.get(params).promise();
-  return data.Item;
+  return dynamodb.get(params).promise();
 }
 
-const list = async () => {
+const list = async (): Promise<ScanOutput> => {
   const dynamodb = new DynamoDB.DocumentClient();
-  const params = {
+  const params: ScanInput = {
     TableName,
   };
 
-  const data = await dynamodb.scan(params).promise();
-  return data.Items;
+  return dynamodb.scan(params).promise();
 };
 
-const create = async (item: DynamoDB.DocumentClient.PutItemInputAttributeMap) => {
-  const dynamodb = new DynamoDB.DocumentClient();
-  const params = {
+const create = async (item: DocumentClient.PutItemInputAttributeMap): Promise<PutItemOutput> => {
+  const dynamodb = new DocumentClient();
+  const params: DocumentClient.PutItemInput = {
     TableName,
     ConditionExpression: 'attribute_not_exists(id)',
     Item: item,
   }
-  await dynamodb.put(params).promise();
-  return item;
+  return dynamodb.put(params).promise();
 };
 
-const update = async (item: DynamoDB.DocumentClient.PutItemInputAttributeMap) => {
-  const dynamodb = new DynamoDB.DocumentClient();
-  const params = {
+const update = async (item: DocumentClient.PutItemInputAttributeMap): Promise<PutItemOutput> => {
+  const dynamodb = new DocumentClient();
+  const params: DocumentClient.PutItemInput = {
     TableName,
     ConditionExpression: 'attribute_exists(id)',
     Item: item,
   }
-  const created = await dynamodb.put(params).promise();
-  return item;
+  return dynamodb.put(params).promise();
 };
 
-const deleteItem = async (id: string) => {
-  const dynamodb = new DynamoDB.DocumentClient();
-  const params = {
+const deleteItem = async (id: string): Promise<DeleteItemOutput> => {
+  const dynamodb = new DocumentClient();
+  const params: DocumentClient.DeleteItemInput = {
     TableName,
-    Key: {
-      id,
-    },
+    ConditionExpression: 'attribute_exists(id)',
+    Key: { id },
+    ReturnValues: 'ALL_OLD',
   }
-  const deleted = await dynamodb.delete(params).promise();
-  return id;
+
+  return await dynamodb.delete(params).promise();
 };
 
 export default {

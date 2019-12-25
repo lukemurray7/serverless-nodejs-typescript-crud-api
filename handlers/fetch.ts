@@ -1,7 +1,14 @@
 import { APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda';
+import { GetItemOutput } from 'aws-sdk/clients/dynamodb';
 
-import { lambdaResponse } from '../helpers';
+import { lambdaResponse } from '../helpers/lambda-response';
 import db from '../lib/database';
+
+/**
+ * Fetches sensor data item based on the id passed. Returns the item.
+ *
+ * @param event Api gateway event object
+ */
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const id: string = event.pathParameters ? event.pathParameters.id : '';
@@ -11,8 +18,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 
   try {
-    const item = await db.fetch(id);
-    return lambdaResponse(null, JSON.stringify({ item }));
+    const item: GetItemOutput = await db.fetch(id);
+    return lambdaResponse(null, JSON.stringify({ item: item.Item }));
   } catch (error) {
     return lambdaResponse({
       statusCode: error.statusCode || 500,

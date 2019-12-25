@@ -6,15 +6,19 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "deploy": "npm run build && serverless deploy",
+    "deploy": "npm run build && yarn test && serverless deploy",
     "deployFunction": "npm run build && serverless deploy function -f"
   },
   "dependencies": {
     "aws-sdk": "^2.593.0",
-    "serverless-iam-roles-per-function": "^2.0.2"
+    "axios": "^0.19.0",
+    "dayjs": "^1.8.18",
+    "serverless-iam-roles-per-function": "^2.0.2",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@serverless/event-mocks": "^1.1.1",
+    "@types/uuid": "^3.4.6",
     "@types/aws-lambda": "^8.10.17",
     "@types/jest": "^24.0.24",
     "@types/node": "^8.0.57",
@@ -24,6 +28,7 @@
     "source-map-support": "^0.5.6",
     "ts-jest": "^24.2.0",
     "ts-loader": "^4.2.0",
+    "typedoc": "^0.15.5",
     "typescript": "^3.7.4",
     "webpack": "^4.5.0"
   },

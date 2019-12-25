@@ -1,9 +1,7 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
+import { ErrorObject } from '../interfaces';
 
-export interface ErrorObject {
-  message: string,
-  statusCode: number,
-};
+
 
 export const lambdaResponse = (error: ErrorObject | null, response: string | null): APIGatewayProxyResult => {
   if (error) {
