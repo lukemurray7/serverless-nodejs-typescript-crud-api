@@ -112,7 +112,7 @@ functions:
     iamRoleStatements:
       - Effect: "Allow"
         Action:
-          - dynamodb:PutItem
+          - dynamodb:UpdateItem
         Resource:
           - "Fn::GetAtt": [ SensorDataTable, Arn ]
   

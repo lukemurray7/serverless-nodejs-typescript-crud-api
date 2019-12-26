@@ -21,7 +21,7 @@ const generatePolicy = (authenticated: boolean, methodArn: string): CustomAuthor
 };
 
 const getAPIKey = async (): Promise<string> => {
-  const ssm: SSM = new SSM();
+  const ssm = new SSM();
   const result = await ssm.getParameter({ Name: secretName }).promise();
   if (result.Parameter && result.Parameter.Value) {
     return result.Parameter.Value;
@@ -36,9 +36,11 @@ const handler = async (event: CustomAuthorizerEvent): Promise<CustomAuthorizerRe
       throw new Error("Unauthorized");
     }
     const key: string = await getAPIKey();
+
     if (token === key) {
       return generatePolicy(true, event.methodArn);
     }
+
     throw new Error("Unauthenticated");
   } catch (error) {
     return generatePolicy(false, event.methodArn);

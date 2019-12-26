@@ -21,7 +21,7 @@ export const handler = async (event: SNSEvent): Promise<string> => {
     }
 
     await axios.post(slackEndpoint, {
-      text: `item: ${JSON.stringify(message.item)}\ndeletedAt: ${message.deletedAt}\ntable: ${message.tableName}`,
+      text: `item: \`\`\`${JSON.stringify(message.item)}\`\`\`\ndeletedAt: ${message.deletedAt}\ntable: ${message.tableName}`,
     });
 
     return 'success';

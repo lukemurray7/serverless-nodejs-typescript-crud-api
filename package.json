@@ -7,7 +7,8 @@
     "test": "jest",
     "build": "tsc",
     "deploy": "npm run build && yarn test && serverless deploy",
-    "deployFunction": "npm run build && serverless deploy function -f"
+    "deployFunction": "npm run build && serverless deploy function -f",
+    "seed": "node dist/seed/mockseed.js"
   },
   "dependencies": {
     "aws-sdk": "^2.593.0",

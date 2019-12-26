@@ -17,19 +17,16 @@ const REQUIRED = ['id'];
 
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  if (validateRequest(event.body = '', REQUIRED)) {
-    return lambdaResponse({ statusCode: 400, message: "Item to update not found" }, null);
+  if (!event.body || !validateRequest(event.body, REQUIRED)) {
+    return lambdaResponse({ statusCode: 400, message: "Bad Request" }, null);
   }
 
   try {
-    const body: UpdateInput = JSON.parse(event.body);
-    const updated: PutItemOutput = await db.update(body);
+    const { id, ...rest } = JSON.parse(event.body);
+    const updated: PutItemOutput = await db.update(id, rest);
 
     return lambdaResponse(null, JSON.stringify({
-      item: {
-        ...updated.Attributes,
-        body,
-      },
+      item: updated.Attributes,
     }));
   } catch (error) {
     return lambdaResponse({

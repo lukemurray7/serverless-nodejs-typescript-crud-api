@@ -1,9 +1,7 @@
 import { DynamoDB } from 'aws-sdk';
 import {
-  AttributeMap,
   ScanInput,
   ScanOutput,
-  GetItemInput,
   DocumentClient,
   PutItemOutput,
   GetItemOutput,
@@ -40,14 +38,31 @@ const create = async (item: DocumentClient.PutItemInputAttributeMap): Promise<Pu
   return dynamodb.put(params).promise();
 };
 
-const update = async (item: DocumentClient.PutItemInputAttributeMap): Promise<PutItemOutput> => {
+const update = async (
+  id: string,
+  updateItems: DocumentClient.AttributeMap
+): Promise<PutItemOutput> => {
+
+  const attributeNames: DocumentClient.AttributeMap = {};
+  const attributeValues: DocumentClient.AttributeMap = {};
+  let updateExpression: string = 'set ';
+
+  Object.keys(updateItems).forEach((key) => {
+    attributeNames[`#${key}`] = `${key}`;
+    attributeValues[`:${key}`] = updateItems[key];
+    updateExpression = `${updateExpression}#${key} = :${key}, `;
+  });
+
   const dynamodb = new DocumentClient();
-  const params: DocumentClient.PutItemInput = {
+  const params: DocumentClient.UpdateItemInput = {
     TableName,
-    ConditionExpression: 'attribute_exists(id)',
-    Item: item,
+    ExpressionAttributeNames: attributeNames,
+    ExpressionAttributeValues: attributeValues,
+    UpdateExpression: updateExpression.slice(0, -2),
+    Key: { id },
+    ReturnValues: 'ALL_NEW',
   }
-  return dynamodb.put(params).promise();
+  return dynamodb.update(params).promise();
 };
 
 const deleteItem = async (id: string): Promise<DeleteItemOutput> => {

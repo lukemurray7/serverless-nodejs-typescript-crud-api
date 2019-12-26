@@ -2,24 +2,28 @@
 
 ## Set up
 
+You will need to have node installed, and the serverless framework to deploy this service.
+
 1. Clone the repo and run `yarn install` or `npm install`.
 
-2. If you want the SNS topic to post to slack - firstly you will need to create an incoming webhook using the slack api.
+2. Create a env.yml file in the root of the project, fill in the required environment variables, look at the sample-env.yml to see what is needed.
+
+```
+  TABLE_NAME: 'sensor-data-table'    # DynamoDB table name
+  SECRET_NAME: 'api-key'   # Name of the API key secret stored in Systems Manager Parameter Store
+  EMAIL_SUBSCRIBER_ADDRESS: 'example@test.com' # Email address needed to subscribe to the SNS delete topic
+  SLACK_ENDPOINT: 'slack-endpoint' # Endpoint to post slack notifications to
+```
+
+3. If you want the SNS topic to post to slack - firstly you will need to create an incoming webhook using the slack api.
 
 To do so follow these instruction: https://slack.com/intl/en-gb/help/articles/115005265063-Incoming-WebHooks-for-Slack
 
-3. Add an API Key to Systems Manager Parameter Store in the AWS console - whatever you call the secret name will be used in the env.yml in the next step.
-
-4. Create a env.yml file in the root of the project, fill in the required environment variables, look at the sample-env.yml to see what is needed.
-
-```
-  TABLE_NAME: 'value'    # DynamoDB table name.
-  SECRET_NAME: 'value'   # Name of the API key secret stored in Systems Manager Parameter Store.
-  EMAIL_SUBSCRIBER_ADDRESS: 'value' # Email address needed to subscribe to the SNS delete topic.
-  SLACK_ENDPOINT: 'value' # Endpoint to post slack notifications to.
-```
+4. Add an API Key (a uuid for example) to Systems Manager Parameter Store in the AWS console - whatever you call the secret name will be used in the env.yml in the next step.
 
 5. To deploy the service run `yarn deploy`
+
+6. To add some mock data to the dynamo table - run `yarn seed` or you can just add an item using the create endpoint. The default table name for seeding will be process.env.TABLE_NAME or "sensor-data-table".
 
 6. Test endpoints using the API Gateway endpoints returned in the console after running the deploy command.
 
