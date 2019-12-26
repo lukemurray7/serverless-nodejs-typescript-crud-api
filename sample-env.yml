@@ -1,4 +1,4 @@
 TABLE_NAME: 'sensor-data-table'    # DynamoDB table name
-SECRET_NAME: 'api-key'   # Name of the API key secret stored in Systems Manager Parameter Store
+SECRET_NAME: 'my-api-key'   # Name of the API key secret stored in Systems Manager Parameter Store
 EMAIL_SUBSCRIBER_ADDRESS: 'example@test.com' # Email address needed to subscribe to the SNS delete topic
 SLACK_ENDPOINT: 'slack-endpoint' # Endpoint to post slack notifications to

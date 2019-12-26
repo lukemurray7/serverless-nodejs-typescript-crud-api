@@ -10,7 +10,7 @@ You will need to have node installed, and the serverless framework to deploy thi
 
 ```
   TABLE_NAME: 'sensor-data-table'    # DynamoDB table name
-  SECRET_NAME: 'api-key'   # Name of the API key secret stored in Systems Manager Parameter Store
+  SECRET_NAME: 'my-api-key'   # Name of the API key secret stored in Systems Manager Parameter Store
   EMAIL_SUBSCRIBER_ADDRESS: 'example@test.com' # Email address needed to subscribe to the SNS delete topic
   SLACK_ENDPOINT: 'slack-endpoint' # Endpoint to post slack notifications to
 ```
@@ -33,6 +33,9 @@ To do so follow these instruction: https://slack.com/intl/en-gb/help/articles/11
 
 The API URL will be in the format `https://<API_GATEWAY_ID>.execute-api.eu-west-1.amazonaws.com/<STAGE>/<PATH>`
 You can find the `API_GATEWAY_ID` in the console, the stage will be `dev` unless specified otherwise.
+
+All the endpoints will need an Authorization header which will be the api key you stored in Systems Manager Parameter store.
+
 
 ### Create
 
