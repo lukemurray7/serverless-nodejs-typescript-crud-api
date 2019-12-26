@@ -18,7 +18,7 @@ describe('Create handler', () => {
     const result = await handler(mockEvent);
     expect(result).toEqual({
       statusCode: 400,
-      body: '{"message":"Bad Request"}',
+      body: JSON.stringify({ 'message': 'Bad Request' }),
     });
     done();
   });
@@ -32,7 +32,7 @@ describe('Create handler', () => {
     const result = await handler(mockEvent);
     expect(result).toEqual({
       statusCode: 400,
-      body: '{"message":"Bad Request"}',
+      body: JSON.stringify({ 'message': 'Bad Request' }),
     });
     done();
   });

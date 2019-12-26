@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { SNS } from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 
-export const publish = async (item: DocumentClient.AttributeMap): Promise<null> => {
+const send = async (item: DocumentClient.AttributeMap): Promise<null> => {
   const sns: SNS = new SNS();
   const deletedAt: string = dayjs().format('DD-MM-YYYY, HH:mm:ss');
 
@@ -24,4 +24,8 @@ export const publish = async (item: DocumentClient.AttributeMap): Promise<null> 
     console.error(error);
     return null;
   }
+};
+
+export default {
+  send,
 };
