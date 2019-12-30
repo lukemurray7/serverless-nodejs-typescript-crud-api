@@ -19,6 +19,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
   try {
     const item: GetItemOutput = await db.fetch(id);
+    if (!item.Item) {
+      return lambdaResponse({ statusCode: 404, message: "Not Found" }, null);
+    }
+
     return lambdaResponse(null, JSON.stringify({ item: item.Item }));
   } catch (error) {
     return lambdaResponse({
