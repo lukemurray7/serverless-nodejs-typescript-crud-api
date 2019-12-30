@@ -26,7 +26,7 @@ You will need to have node installed, and the serverless framework to deploy thi
 5. To deploy the service run `yarn deploy`
 
 
-6. To add some mock data to the dynamo table - run `yarn seed` or you can just add an item using the create endpoint. The default table name for seeding will be process.env.TABLE_NAME or "sensor-data-table".
+6. To add some mock data to the dynamo table - run `yarn seed` or you can just add an item using the create endpoint. The default table name for seeding will be process.env.TABLE_NAME or "sensor-data-table". You will need to have programmatic access to AWS configured for this to work.
 
 
 6. Test endpoints using the API Gateway endpoints returned in the console after running the deploy command.
@@ -39,7 +39,7 @@ You will need to have node installed, and the serverless framework to deploy thi
 The API URL will be in the format `https://<API_GATEWAY_ID>.execute-api.eu-west-1.amazonaws.com/<STAGE>/<PATH>`
 You can find the `API_GATEWAY_ID` in the console, the stage will be `dev` unless specified otherwise.
 
-All the endpoints will need an Authorization header which will be the api key you stored in Systems Manager Parameter store.
+All the endpoints will need an Authorization header which will be the api key you stored in Systems Manager Parameter store in step 4 above.
 
 
 ### Create

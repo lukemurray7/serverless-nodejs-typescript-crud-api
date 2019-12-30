@@ -56,6 +56,7 @@ const update = async (
   const dynamodb = new DocumentClient();
   const params: DocumentClient.UpdateItemInput = {
     TableName,
+    ConditionExpression: 'attribute_exists(id)',
     ExpressionAttributeNames: attributeNames,
     ExpressionAttributeValues: attributeValues,
     UpdateExpression: updateExpression.slice(0, -2),
