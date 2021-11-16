@@ -11,7 +11,7 @@
     "seed": "node dist/seed/mockseed.js"
   },
   "dependencies": {
-    "aws-sdk": "^2.593.0",
+    "aws-sdk": "^2.814.0",
     "axios": "^0.19.0",
     "dayjs": "^1.8.18",
     "serverless-iam-roles-per-function": "^2.0.2",
